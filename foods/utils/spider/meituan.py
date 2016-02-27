@@ -59,7 +59,7 @@ def parse_meituan(response):
 
     sel = response.xpath('//div[@data-component="bread-nav"]')
     tag = sel.xpath('div/a[@gaevent="crumb/index"]/text()').extract_first()
-    if tag != u'重庆美食':
+    if tag not in [ u'重庆美食',u'重庆休闲娱乐']:
             # with open(self.downLoadUrlsFile, 'a') as f:
             #     f.write(response.url + '\n')
         return None
