@@ -82,11 +82,17 @@ def parse_meituan(response):
     shopName = sel.xpath('.//h2/span[@class="title"]/text()').extract_first()
     shopAddr = sel.xpath('.//p/span[@class="geo"]/text()').extract_first()
 
-    shopJson = json.loads(sel.xpath('.//p/span[@id="map-canvas"]/@data-params').extract_first())
-    shopInfo = shopJson['shops'][shopId]
-    shopPhone = shopInfo['phone']
-    shopGlat = str(shopInfo['position'][0])
-    shopGlng = str(shopInfo['position'][1])
+
+    shopPhone = ''
+    shopGlat = ''
+    shopGlng = ''
+    shopsel = sel.xpath('.//p/span[@id="map-canvas"]/@data-params')
+    if shopsel:
+        shopJson = json.loads(sel.xpath('.//p/span[@id="map-canvas"]/@data-params').extract_first())
+        shopInfo = shopJson['shops'][shopId]
+        shopPhone = shopInfo['phone']
+        shopGlat = str(shopInfo['position'][0])
+        shopGlng = str(shopInfo['position'][1])
 
     shopUrl = response.url
     shopPicSave = ''
@@ -107,10 +113,6 @@ def parse_meituan(response):
     item['speciality'] = ''
     item['shop_hours'] = ''
     item['update_time'] = ''
-
-        # with open(self.downLoadUrlsFile, 'a') as f:
-        #     f.write(response.url + '\n')
-
 
     return item
 
