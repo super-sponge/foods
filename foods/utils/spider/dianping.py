@@ -32,18 +32,23 @@ class DianPingItem(Item):
     shop_id=Field() # 商家ID	商家代码
     shop_name=Field()   # 商家名称	商家名称
     shop_adress=Field()	# 商家地址	商家具体地址
-    shop_telephone1=Field()	# 商家电话1	商家联系电话1
-    shop_telephone2=Field()	# 商家电话2	商家联系电话2
+    shop_telephone=Field()	# 商家电话1	商家联系电话1
     shop_describe=Field()	# 门店介绍	商家门店的具体介绍等信息
     shop_service=Field()	# 门店服务	商家可以提供的WIFI,停车等服务
     speciality=Field()  # 商家特色      商家特色菜品等信息
     shop_hours=Field()	# 营业时间	商家的正常营业时间
     longitude_location=Field()	# 商家经度	商家所属经度
     altitudes_location=Field()	# 商家纬度	商家所属纬度
-    shop_type1=Field()	# 商家大类	大类如：美食、酒店、休闲服务等（目前只有美食）
-    shop_type2=Field()	# 商家小类	小类如：火锅、川菜、西北菜、小吃等
-    district=Field()	# 所属区县	江北区、渝北区、忠县、开县等
-    street=Field()	# 所属商圈	大学城、解放碑、观影桥、西城天街等
+    nav0 = Field()  #导航栏数据 可以分析出区县与类别
+    nav1 = Field()  #导航栏数据 可以分析出区县与类别
+    nav2 = Field()
+    nav3 = Field()
+    nav4 = Field()
+    nav5 = Field()
+    nav6 = Field()
+    nav7 = Field()
+    nav8 = Field()
+    nav9 = Field()
     per_consume=Field()	# 人均消费	人均消费XX元
     taste_score=Field()	# 口味分	商家口味评分（1-10分）
     environment_score=Field()	# 环境分	商家环境评分（1-10分）
@@ -63,21 +68,42 @@ class DianPingItem(Item):
 def parse_dianping(response):
 
     item = DianPingItem()
-#定义五个模块变量
-    sel3 = response.xpath('//div[@class="breadcrumb"]')
-    sel4 = response.xpath('//div[@class="basic-info default nug_shop_ab_pv-a"]')
-    sel6 = response.xpath('//div[@class="brief-info"]')
-    sel7 = response.xpath('//div[@id="shop-score"]/ul[@class="stars"]')
-    sel8 = response.xpath('//div[@class="other J-other"]')
-#定义变量数据解析
-    shop_name= sel4.xpath('.//h1[@class="shop-name"]/text()').extract_first()
-    shop_adress= sel4.xpath('.//span[@itemprop="street-address"]/@title').extract_first()
-    shop_telephone1= sel4.xpath('.//p/span[@itemprop="tel"][1]/text()').extract_first()
-    shop_telephone2= sel4.xpath('.//p/span[@itemprop="tel"][2]/text()').extract_first()
-    shop_describe= sel8.xpath('.//p[3]/text()').extract_first()
-    shop_service= ''
-    speciality= ''
-    shop_hours= sel4.xpath('.//div/p/span[@class="item"]/text()').extract_first()
+
+    item['shop_photo']= ''
+    item['update_time']= ''
+    item['shop_describe']= ''
+    item['shop_service']= ''
+    item['speciality']= ''
+    item['input_time']= time.strftime('')
+    item['data_source']= response.url
+    item['score5'] = ''
+    item['score4'] = ''
+    item['score3'] = ''
+    item['score2'] = ''
+    item['score1'] = ''
+
+
+
+    #基本信息
+    basic = response.xpath('//div[@id="basic-info"]')
+
+    if not basic:
+        return None
+    shop_name= basic.xpath('.//h1[@class="shop-name"]/text()').extract_first().replace(u',',' ').replace(u'，',' ')
+    quxian = basic.xpath('.//span[@itemprop="locality region"]/text()').extract_first()
+    address = basic.xpath('.//span[@itemprop="street-address"]/@title').extract_first().replace(u',',' ').replace(u'，',' ')
+    if quxian == None:
+        shop_adress = address
+    else:
+        shop_adress= quxian + '|' + address
+
+    shop_telephone= "|".join(basic.xpath('.//p/span[@itemprop="tel"][1]/text()').extract())
+
+    item['shop_id']= re.search(r'/shop/([\d]+)$', response.url).group(1)
+    item['shop_name'] = shop_name.strip().strip('\n')
+    item['shop_adress'] = shop_adress.replace('，','')
+    item['shop_telephone'] = shop_telephone
+
     lng = re.search(r'lng:([\d]+\.[\d]+)', response.body)
     lat = re.search(r'lat:([\d]+\.[\d]+)', response.body)
     longitude_location= ''
@@ -86,116 +112,64 @@ def parse_dianping(response):
         longitude_location= lng.group(1)
         altitudes_location= lat.group(1)
 
+    item['longitude_location'] = longitude_location
+    item['altitudes_location'] = altitudes_location
 
-    shop_type1= ''
-    shop_type2= sel3.xpath('.//a[4]/text()').extract_first()
-    district= sel3.xpath('.//a[2]/text()').extract_first()
-    street= sel3.xpath('.//a[3]/text()').extract_first()
-    per_consume= sel6.xpath('.//span[@class="item"][2]/text()').extract_first()
-    taste_score= sel6.xpath('.//span[@class="item"][3]/text()').extract_first()
-    environment_score= sel6.xpath('.//span[@class="item"][4]/text()').extract_first()
-    serve_score= sel6.xpath('.//span[@class="item"][5]/text()').extract_first()
-    evaluate_number= sel6.xpath('.//span[@class="item"][1]/text()').extract_first()
-    shop_photo= ''  # response.xpath('//div[@class="photos"]/a/img/@src').extract_first()
-    input_time= time.strftime('')
-    update_time= ''
-    data_source= ''
-#变量数据解析后判断内容是否有空格，若有则替换
-    if shop_name:
-        shop_name=shop_name.replace('\n','').strip()
-    if shop_adress:                         
-        shop_adress=shop_adress.replace('\n','').strip()
-    if shop_telephone1:                         
-        shop_telephone1=shop_telephone1.replace('\n','').strip()
-    if shop_telephone2:                         
-        shop_telephone2=shop_telephone2.replace('\n','').strip()
-    if shop_describe:                         	
-        shop_describe=shop_describe.replace('\n','').strip()
-    if shop_service:                         
-        shop_service=shop_service.replace('\n','').strip()
-    if speciality:                         
-        speciality=speciality.replace('\n','').strip()
-    if shop_hours:                         
-        shop_hours=shop_hours.replace('\n','').strip()
-    if longitude_location:                         	
-        longitude_location=longitude_location.replace('\n','').strip()
-    if altitudes_location:                         
-        altitudes_location=altitudes_location.replace('\n','').strip()
-    if shop_type1:                         
-        shop_type1=shop_type1.replace('\n','').strip()
-    if shop_type2:                         
-        shop_type2=shop_type2.replace('\n','').strip()
-    if district:                         
-        district=district.replace('\n','').strip()
-    if street:                         
-        street=street.replace('\n','').strip()
-    if per_consume:                         
-        per_consume=per_consume.replace('\n','').strip()
-    if taste_score:                         
-        taste_score=taste_score.replace('\n','').strip()
-    if environment_score:                         
-        environment_score=environment_score.replace('\n','').strip()
-    if serve_score:                         
-        serve_score=serve_score.replace('\n','').strip()
-    if evaluate_number:                         
-        evaluate_number=evaluate_number.replace('\n','').strip()
-#    if score5:                         
-#        score5=score5.replace('\n','').strip()
-#    if score4:                         
-#        score4=score4.replace('\n','').strip()
-#    if score3:                         
-#        score3=score3.replace('\n','').strip()
-#    if score2:                         
-#        score2=score2.replace('\n','').strip()
-#    if score1:                         
-#        score1=score1.replace('\n','').strip()
-#把最终替换处理后的变量给item
-    item['shop_id']= re.search(r'/shop/([\d]+)$', response.url).group(1)
-    item['shop_name']= shop_name                              
-    item['shop_adress']= shop_adress                   
-    item['shop_telephone1']= shop_telephone1               
-    item['shop_telephone2']= shop_telephone2               
-    item['shop_describe']= shop_describe                 
-    item['shop_service']= shop_service                  
-    item['speciality']= speciality                    
-    item['shop_hours']= shop_hours                    
-    item['longitude_location']= longitude_location            
-    item['altitudes_location']= altitudes_location            
-    item['shop_type1']= shop_type1                    
-    item['shop_type2']= shop_type2                    
-    item['district']= district                      
-    item['street']= street                        
-    item['per_consume']= per_consume                   
-    item['taste_score']= taste_score                   
-    item['environment_score']= environment_score             
-    item['serve_score']= serve_score                   
-    item['evaluate_number']= evaluate_number
-    item['score5']= ''
-    item['score4']= ''
-    item['score3']= ''
-    item['score2']= ''
-    item['score1']= '' 
-    if sel7:                                          
-        score1 = "".join(sel7.xpath('./li[5]/text()').extract())
-        score2 = "".join(sel7.xpath('./li[4]/text()').extract())
-        score3 = "".join(sel7.xpath('./li[3]/text()').extract())
-        score4 = "".join(sel7.xpath('./li[2]/text()').extract())
-        score5 = "".join(sel7.xpath('./li[1]/text()').extract())
-        
+    scores = response.xpath('//div[@id="shop-score"]/ul[@class="stars"]')
+
+    if scores:
+        score1 = "".join(scores.xpath('./li[5]/text()').extract())
+        score2 = "".join(scores.xpath('./li[4]/text()').extract())
+        score3 = "".join(scores.xpath('./li[3]/text()').extract())
+        score4 = "".join(scores.xpath('./li[2]/text()').extract())
+        score5 = "".join(scores.xpath('./li[1]/text()').extract())
+
         item['score5']= re.sub(r'[\t\n\s+]', '', score5)
         item['score4']= re.sub(r'[\t\n\s+]', '', score4)
         item['score3']= re.sub(r'[\t\n\s+]', '', score3)
         item['score2']= re.sub(r'[\t\n\s+]', '', score2)
-        item['score1']= re.sub(r'[\t\n\s+]', '', score1)       
-#    item['score5']= score5                        
-#    item['score4']= score4                        
-#    item['score3']= score3                        
-#    item['score2']= score2                        
-#    item['score1']= score1                        
-    item['shop_photo']= shop_photo                    
-    item['input_time']= input_time                    
-    item['update_time']= update_time                   
-    item['data_source']= response.url
+        item['score1']= re.sub(r'[\t\n\s+]', '', score1)
+
+
+
+    #获取其他内容，包括 别       名  营业时间
+    item['shop_hours'] = ''
+    other_infos = basic.xpath('.//div[@class="other J-other Hide"]/p[@class="info info-indent"]')
+    for other in other_infos:
+        info_name = other.xpath('./span[@class="info-name"]/text()').extract_first()
+        info_data = other.xpath('./span[@class="item"]/text()').extract_first()
+        if info_name == u'营业时间：' and info_data:
+            item['shop_hours']= info_data.strip().replace('\n',' ').strip().replace(u',',' ').replace(u'，',' ')
+    #获取人均，口味，环境，服务
+    item['per_consume'] = '0.0'
+    item['taste_score'] = '0.0'
+    item['environment_score'] = '0.0'
+    item['serve_score'] = '0.0'
+    item['evaluate_number'] = '0'
+
+    brief_infos = basic.xpath('.//div[@class="brief-info"]/span/text()').extract()
+    for brief in brief_infos:
+        lstitem = brief.split(u'：')
+        lstlength = len(lstitem)
+        idx = brief.find(u'条评论')
+        if lstlength == 1 and idx != -1:
+            item['evaluate_number'] = brief[0:idx]
+        elif lstitem[0] == u'人均':
+            item['per_consume'] = lstitem[1].replace('元','')
+        elif lstitem[0] == u'口味':
+            item['taste_score'] = lstitem[1]
+        elif lstitem[0] == u'环境':
+            item['environment_score'] = lstitem[1]
+        elif lstitem[0] == u'服务':
+            item['serve_score'] = lstitem[1]
+
+    #获取导航栏数据用户分析区县，类别
+    for i in range(10):
+        item['nav' + str(i)] = ''
+    nav_infos = response.xpath('//div[@class="breadcrumb"]/a/text()').extract()
+    navlength = len(nav_infos)
+    for i in range(navlength):
+        item['nav' + str(i)] = nav_infos[i].strip().strip('\n').strip()
 
     return  item
 
@@ -207,13 +181,15 @@ def saveItem(htmlfile, writer):
     url = 'http://www.dianping.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
     item = parse_dianping(response)
+    # t = htmlfile.split('.')[-1]
+    # item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     if item:
         row = []
         for id in FIELDS_TO_EXPORT_DIANPING:
             row.append(item[id])
         writer.writerow(row)
-if __name__ == '__main__':
 
+def parse_all():
     outFile = "../hlwdata/data/dianping_new_page.csv"
     infilelst = '../hlwdata/data/url/dianping_page_index.txt'
 
@@ -225,3 +201,26 @@ if __name__ == '__main__':
         saveItem(line.rstrip('\n'), writer)
 
     csvfile.close()
+
+def parse_one(htmlfile):
+    html = ''
+    with open(htmlfile) as f:
+        html = f.read()
+    url = 'http://www.dianping.com/shop/' + htmlfile.split('.')[-2]
+    response = HtmlResponse(url=url,body=html)
+    item = parse_dianping(response)
+    if item:
+        for id in FIELDS_TO_EXPORT_DIANPING:
+            print id+ ': ' + str(item[id])
+
+
+if __name__ == '__main__':
+    parse_all()
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.36954358.20160229093050')
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.48130224.20160228131523')
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.18088299.20160229074648')
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.10010841.20160229045541')
+
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.13919136.20160227224749')
+    # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.17198038.20160227225236')
+

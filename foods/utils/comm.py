@@ -65,19 +65,32 @@ def cmpIndex(file1, file2):
 
     return result
 
+def extractUrl(file):
+    urls = set()
+    with open(file) as f:
+        for line in f.readlines():
+            urls.add(line.split(',')[-1].rstrip('\n'))
+    for url in urls:
+        print url
+
+
 
 if __name__ == '__main__':
-    # urls = loadUrl('/home/sponge/scrapy/foods/data/start_url.txt')
 
-    # lst = cmpIndex('/home/sponge/scrapy/foods/data/downloaded_url.txt',
-    #          '/home/sponge/scrapy/foods/data/start_url.txt')
-    # f = open('/home/sponge/scrapy/foods/data/downloaded_url.txt', 'w')
-    # for url in set(lst):
-    #     f.write(url + '\n')
-    #
-    lst = cmpIndex('/home/sponge/scrapy/hlwdata/data/meituan_download_url.txt',
-             '/home/sponge/scrapy/hlwdata/data/meituan_start_url.url')
-    f = open('/home/sponge/scrapy/hlwdata/data/meituan_download_url.url', 'w')
+    lst = cmpIndex('/home/sponge/scrapy/hlwdata/data/url/dianping_download_url.txt',
+             '/home/sponge/scrapy/hlwdata/data/url/dianping_start_url.txt')
+    f = open('/home/sponge/scrapy/hlwdata/data/url/dianping_download_url.txt', 'w')
     for url in set(lst):
         f.write(url + '\n')
+    #
+    # lst = cmpIndex('/home/sponge/scrapy/hlwdata/data/meituan_download_url.txt',
+    #          '/home/sponge/scrapy/hlwdata/data/meituan_start_url.url')
+    # f = open('/home/sponge/scrapy/hlwdata/data/meituan_download_url.url', 'w')
+    # for url in set(lst):
+    #     f.write(url + '\n')
+
+    # import sys
+    # extractUrl(sys.argv[1])
+    # extractUrl('/home/sponge/scrapy/hlwdata/data/nuomi_new.csv')
+
 

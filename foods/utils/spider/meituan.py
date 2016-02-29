@@ -79,8 +79,8 @@ def parse_meituan(response):
 
     shopId = re.search(r'/shop/([\d]+)$', response.url).group(1)
 
-    shopName = sel.xpath('.//h2/span[@class="title"]/text()').extract_first()
-    shopAddr = sel.xpath('.//p/span[@class="geo"]/text()').extract_first()
+    shopName = sel.xpath('.//h2/span[@class="title"]/text()').extract_first().replace(u',',' ').replace(u'，',' ')
+    shopAddr = sel.xpath('.//p/span[@class="geo"]/text()').extract_first().replace(u',',' ').replace(u'，',' ')
 
 
     shopPhone = ''

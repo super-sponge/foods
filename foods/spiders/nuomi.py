@@ -19,6 +19,8 @@ class NuomiSpider(CrawlSpider):
     startUrlsFile = "../hlwdata/data/url/nuomi_deal_start_url.txt"
     downLoadUrlsFile ="../hlwdata/data/url/nuomi_deal_download_url.txt"
     downshopUrlsFile ="../hlwdata/data/url/nuomi_shop_download_url.txt"
+    jsonDir ="../hlwdata/data/json/nuomi/shop/"
+    jsonDir ="../hlwdata/data/json/nuomi/city/"
 
     lst = loadUrl(downLoadUrlsFile)
 
@@ -45,24 +47,37 @@ class NuomiSpider(CrawlSpider):
         dealUrl = 'http://www.nuomi.com/pcindex/main/shopchain?dealId=' + dealId
 
         # html = requests.get(dealUrl, headers=self.headers)
+        # js['data']['city'][shopCity]
         html = requests.get(dealUrl)
         js = json.loads(html.text)
         for shop in js['data']['shop']:
-            shopId = shop['merchant_id']
-            shoplink = shop['link']
             shopCity = shop['city_id']
+            district_id = shop['district_id']
+            shopId = shop['merchant_id']
+            with open(self.jsonDir + shopId, 'w') as f:
+                f.write(json.dumps(shop))
+            with open(self.jsonDir + shopId + '.' + shopCity, 'w') as f:
+                f.write(json.dumps(js['data']['city'][shopCity]))
+
+            shoplink = shop['link']
             #只获取重庆的美食信息
             # if shopId in self.visitedShop or shopCity != u'900010000':
             if shoplink in self.visitedShop:
                 continue
             else:
                 self.visitedShop.add(shoplink)
-            # yield scrapy.Request(shop['link'], self.parse_nuomi_shop, meta=js['data']['shop'])
-            yield scrapy.Request(shoplink, self.parse_nuomi_shop)
+            city = js['data']['city'][shopCity]
+            shopCityName = city['city_name']
+            district = city['district'][district_id]['dist_name']
+            parmeta = {'shopCityName':shopCityName,'district':district }
+
+            yield scrapy.Request(shop['link'], self.parse_nuomi_shop, meta=parmeta)
+            # yield scrapy.Request(shoplink, self.parse_nuomi_shop)
+            # yield scrapy.Request(shoplink, self.parse_nuomi_shop)
     def parse_nuomi_shop(self, response):
         with open(self.downshopUrlsFile, 'a') as f:
             f.write(response.url + '\n')
-        # meta = response.meta
-        item = parse_nuomi(response)
+        meta = response.meta
+        item = parse_nuomi(response, meta =response.meta)
         if item:
             return item

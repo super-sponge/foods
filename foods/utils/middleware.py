@@ -37,10 +37,11 @@ class SavePageMiddleware(object):
 
         pagePath = os.path.join(pagePath, url.path.lstrip('/').replace('/', '.'))
         pageFile = pagePath + '.' + time.strftime('%Y%m%d%H%M%S')
-        with open(pageFile, 'w') as f:
-            f.write(response.body)
+        if response.status == 200:
+            with open(pageFile, 'w') as f:
+                f.write(response.body)
         with open(os.path.join(self.save_path, 'pageindex.txt'), 'a') as fin:
-            fin.write(response.url + ',' + pageFile + '\n')
+            fin.write(response.url + ',' + pageFile + ',' + str(response.status) + '\n')
 
     def process_response(self, request, response, spider):
         self._save(response)

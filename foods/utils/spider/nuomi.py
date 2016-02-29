@@ -41,6 +41,7 @@ class NuomiItem(Item):
     altitudes_location=Field()	# 商家纬度	商家所属纬度
     shop_type1=Field()	# 商家大类	大类如：美食、酒店、休闲服务等（目前只有美食）
     shop_type2=Field()	# 商家小类	小类如：火锅、川菜、西北菜、小吃等
+    shop_shen = Field() #所属于城市
     district=Field()	# 所属区县	江北区、渝北区、忠县、开县等
     street=Field()	# 所属商圈	大学城、解放碑、观影桥、西城天街等
     score=Field()	# 评分	商家的评分（1-5分）
@@ -55,7 +56,7 @@ class NuomiItem(Item):
     data_source=Field()	# 数据来源	糯米
 
 #解析文本内容
-def parse_nuomi(response):
+def parse_nuomi(response, meta = None):
 
     item = NuomiItem()
 #定义两个模块变量
@@ -63,8 +64,13 @@ def parse_nuomi(response):
     sel2 = response.xpath('//div[@class="level-detail"]')
 
     item['shop_id']= re.search(r'/shop/([\d]+)$', response.url).group(1)
-    item['shop_name']= sel1.xpath('.//h2[@class="shop-title"]/text()').extract_first()
-    item['shop_adress']= sel1.xpath('.//p[@class="bd detail-shop-address"]/span/text()').extract_first()
+
+    shop_name = sel1.xpath('.//h2[@class="shop-title"]/text()').extract_first()
+    if  shop_name:
+        item['shop_name']= shop_name.replace(u',',' ').replace(u'，',' ')
+    else:
+        return None
+    item['shop_adress']= sel1.xpath('.//p[@class="bd detail-shop-address"]/span/text()').extract_first().replace(u',',' ').replace(u'，',' ')
     item['shop_telephone1']= sel1.xpath('.//p[@class="bd"]/text()').extract_first()
     item['shop_telephone2']= ''
     item['shop_describe']= ''
@@ -84,7 +90,13 @@ def parse_nuomi(response):
     item['altitudes_location']= altitudes_location
     item['shop_type1']= ''
     item['shop_type2']= ''
+    item['shop_shen']= ''
     item['district']= ''
+    if meta:
+        if meta.has_key('shopCityName'):
+            item['shop_shen']= meta['shopCityName']
+        if meta.has_key('district'):
+            item['district']= meta['district']
     item['street']= ''
     item['score']= sel1.xpath('.//p/span[@class="score"]/text()').extract_first()
     item['per_consume']= sel1.xpath('.//p/span/strong/text()').extract_first()
@@ -92,7 +104,8 @@ def parse_nuomi(response):
     item['positive_number']= sel2.xpath('.//div/span[@class="levels qa-hook-good-num"]/text()').extract_first()
     item['moderate_number']= sel2.xpath('.//div/span[@class="levels qa-hook-normal-num"]/text()').extract_first()
     item['negative_number']= sel2.xpath('.//div/span[@class="levels qa-hook-bad-num"]/text()').extract_first()
-    item['shop_photo']= sel1.xpath('.//div[@class="shop-logo"]/img/@src').extract_first()
+    # item['shop_photo']= sel1.xpath('.//div[@class="shop-logo"]/img/@src').extract_first()
+    item['shop_photo']= ''
     item['input_time']= time.strftime('')
     item['update_time']= ''
     item['data_source']= response.url
@@ -106,6 +119,8 @@ def saveItem(htmlfile, writer):
     url = 'http://www.nuomi.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
     item = parse_nuomi(response)
+    # t = htmlfile.split('.')[-1]
+    # item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     if item:
         row = []
         for id in FIELDS_TO_EXPORT_NUOMI:
@@ -124,6 +139,7 @@ if __name__ == '__main__':
     writer.writerow(FIELDS_TO_EXPORT_NUOMI)
 
     for line in open(infilelst).readlines():
+        print line
         saveItem(line.rstrip('\n'), writer)
 
     csvfile.close()
