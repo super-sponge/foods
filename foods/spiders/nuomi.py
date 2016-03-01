@@ -5,6 +5,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from foods.utils.comm import FilterLinkExtractor
 from foods.utils.comm import loadUrl
 from foods.utils.spider.nuomi import parse_nuomi
+from scrapy.http import Request
 
 import requests,json,os,re
 
@@ -28,10 +29,9 @@ class NuomiSpider(CrawlSpider):
     )
 
     def start_requests(self):
-
-        for url in loadUrl(self.startUrlsFile):
-            yield self.make_requests_from_url(url)
+        self.start_urls += loadUrl(self.startUrlsFile)
         for url in self.start_urls:
+            yield Request(url,callback=self.parse_nuomi_deal)
             yield self.make_requests_from_url(url)
 
 

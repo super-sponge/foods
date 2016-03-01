@@ -2,6 +2,7 @@
 import scrapy
 from foods.utils.comm import FilterLinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
+from scrapy.http import Request
 
 from foods.utils.comm import loadUrl
 from foods.utils.spider.meituan import parse_meituan
@@ -28,10 +29,9 @@ class MeituanSpider(CrawlSpider):
         return links;
 
     def start_requests(self):
-
-        for url in loadUrl(self.startUrlsFile):
-            yield self.make_requests_from_url(url)
+        self.start_urls += loadUrl(self.startUrlsFile)
         for url in self.start_urls:
+            yield Request(url,callback=self.parse_meituan)
             yield self.make_requests_from_url(url)
 
     def parse_meituan(self, response):

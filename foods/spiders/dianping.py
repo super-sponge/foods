@@ -6,6 +6,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from foods.utils.spider.dianping import parse_dianping
 
 from foods.utils.comm import loadUrl
+from scrapy.http import Request
 
 
 class DianpingSpider(CrawlSpider):
@@ -22,10 +23,9 @@ class DianpingSpider(CrawlSpider):
     )
 
     def start_requests(self):
-
-        for url in loadUrl(self.startUrlsFile):
-            yield self.make_requests_from_url(url)
+        self.start_urls += loadUrl(self.startUrlsFile)
         for url in self.start_urls:
+            yield Request(url,callback=self.parse_dianping)
             yield self.make_requests_from_url(url)
 
     def parse_dianping(self, response):
