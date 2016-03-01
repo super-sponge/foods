@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 '''
-@author: 刘军强
+@author: liuhb
 @license: ***
-@contact: 
+@contact:
 @see: https://github.com/super-sponge
 
 @version: 0.0.1
@@ -65,7 +65,7 @@ class DianPingItem(Item):
     data_source=Field()	# 数据来源	大众点评
 
 #解析文本内容
-def parse_dianping(response):
+def parse_dianping(response, file = None):
 
     item = DianPingItem()
 
@@ -74,7 +74,11 @@ def parse_dianping(response):
     item['shop_describe']= ''
     item['shop_service']= ''
     item['speciality']= ''
-    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    if file == None:
+        item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        t = file.split('.')[-1]
+        item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     item['data_source']= response.url
     item['score5'] = ''
     item['score4'] = ''
@@ -97,7 +101,7 @@ def parse_dianping(response):
     else:
         shop_adress= quxian + '|' + address
 
-    shop_telephone= "|".join(basic.xpath('.//p/span[@itemprop="tel"][1]/text()').extract())
+    shop_telephone= "|".join(basic.xpath('.//p/span[@itemprop="tel"]/text()').extract())
 
     item['shop_id']= re.search(r'/shop/([\d]+)$', response.url).group(1)
     item['shop_name'] = shop_name.strip().strip('\n')
@@ -180,7 +184,7 @@ def saveItem(htmlfile, writer):
         html = f.read()
     url = 'http://www.dianping.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
-    item = parse_dianping(response)
+    item = parse_dianping(response, file = htmlfile)
     # t = htmlfile.split('.')[-1]
     # item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     if item:
@@ -208,7 +212,7 @@ def parse_one(htmlfile):
         html = f.read()
     url = 'http://www.dianping.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
-    item = parse_dianping(response)
+    item = parse_dianping(response,file=htmlfile)
     if item:
         for id in FIELDS_TO_EXPORT_DIANPING:
             print id+ ': ' + str(item[id])
@@ -223,4 +227,5 @@ if __name__ == '__main__':
 
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.13919136.20160227224749')
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.17198038.20160227225236')
-
+    # parse_one('/home/scrapy/liuhb/hlwdata/data/page/www.dianping.com/shop.10003973.20160227225439')
+    # parse_one('/home/scrapy/liuhb/hlwdata/data/page/www.dianping.com/shop.17549115.20160301165701')
