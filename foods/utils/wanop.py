@@ -27,7 +27,7 @@ def getWanIp():
 if __name__ == '__main__':
     while True:
         urllib.urlopen("http://admin:admin@192.168.1.1/userRpm/StatusRpm.htm?Disconnect=%B6%CF%20%CF%DF&wan=1")
-	time.sleep(5)
+	time.sleep(1)
         urllib.urlopen("http://admin:admin@192.168.1.1/userRpm/StatusRpm.htm?Connect=%C1%AC%20%BD%D3&wan=1")
 #        print time.ctime() + ' 公网IP地址为：' + getWanIp()
         time.sleep(300)

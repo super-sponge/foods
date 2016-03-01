@@ -39,6 +39,12 @@ class NuomiItem(Item):
     shop_hours=Field()	# 营业时间	商家的正常营业时间
     longitude_location=Field()	# 商家经度	商家所属经度
     altitudes_location=Field()	# 商家纬度	商家所属纬度
+    nav0 = Field()
+    nav1 = Field()
+    nav2 = Field()
+    nav3 = Field()
+    nav4 = Field()
+    nav5 = Field()
     shop_type1=Field()	# 商家大类	大类如：美食、酒店、休闲服务等（目前只有美食）
     shop_type2=Field()	# 商家小类	小类如：火锅、川菜、西北菜、小吃等
     shop_shen = Field() #所属于城市
@@ -54,6 +60,7 @@ class NuomiItem(Item):
     input_time=Field()	# 爬取时间	数据首次爬取时间
     update_time=Field()	# 更新时间	数据更新时间--暂可为空
     data_source=Field()	# 数据来源	糯米
+    deal_source=Field() #糯米产品链接
 
 #解析文本内容
 def parse_nuomi(response, meta = None):
@@ -97,6 +104,10 @@ def parse_nuomi(response, meta = None):
             item['shop_shen']= meta['shopCityName']
         if meta.has_key('district'):
             item['district']= meta['district']
+        if meta.has_key('nav'):
+            for i in range(6):
+                item['nav' + str(i)] = meta['nav' + str(i)]
+            item['deal_source']  = meta['deal']
     item['street']= ''
     item['score']= sel1.xpath('.//p/span[@class="score"]/text()').extract_first()
     item['per_consume']= sel1.xpath('.//p/span/strong/text()').extract_first()
@@ -106,7 +117,7 @@ def parse_nuomi(response, meta = None):
     item['negative_number']= sel2.xpath('.//div/span[@class="levels qa-hook-bad-num"]/text()').extract_first()
     # item['shop_photo']= sel1.xpath('.//div[@class="shop-logo"]/img/@src').extract_first()
     item['shop_photo']= ''
-    item['input_time']= time.strftime('')
+    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
     item['update_time']= ''
     item['data_source']= response.url
 

@@ -73,7 +73,7 @@ def parse_meituan(response):
     item['consume_number']= response.xpath('//div[@class="counts"]/div/span[@class="num"]/text()').extract_first()
     item['evaluate_number']=response.xpath('//div[@class="counts"]/div/a[@class="num rate-count"]/text()').extract_first()
     item['shop_photo']=''
-    item['input_time']= time.strftime('%Y-%m-%d %H:%M:%S')
+    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
 
     sel = response.xpath('//div[@class="fs-section__left"]')
 

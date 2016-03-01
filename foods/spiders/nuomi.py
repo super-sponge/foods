@@ -11,8 +11,6 @@ import requests,json,os,re
 class NuomiSpider(CrawlSpider):
     name = 'nuomi'
     allowed_domains = ['nuomi.com']
-    start_urls = ['http://www.nuomi.com/shop/1482627']
-
     start_urls = []
 
 
@@ -26,7 +24,7 @@ class NuomiSpider(CrawlSpider):
 
     rules = (
         Rule(FilterLinkExtractor(allow=r'http://www.nuomi.com/deal/[\w]+', download = lst), callback='parse_nuomi_deal', follow=True),
-        Rule(FilterLinkExtractor(allow=r'http://www.nuomi.com/shop/[\d]+$', download = lst), callback='parse_nuomi_shop', follow=True),
+        # Rule(FilterLinkExtractor(allow=r'http://www.nuomi.com/shop/[\d]+$', download = lst), callback='parse_nuomi_shop', follow=True),
     )
 
     def start_requests(self):
@@ -42,6 +40,14 @@ class NuomiSpider(CrawlSpider):
 
         with open(self.downLoadUrlsFile, 'a') as f:
             f.write(response.url + '\n')
+        navs = response.xpath('//div[@class="w-bread-crumb"]/ul[@class="crumb-list clearfix"]/li/a/text()').extract()
+        parmeta = dict()
+        parmeta['nav'] = True
+        parmeta['deal'] = response.url
+        for i in range(6):
+            parmeta['nav' + str(i)] = ''
+        for i in range(len(navs)):
+            parmeta['nav' + str(i)] = navs[i].strip('\n')
 
         dealId = response.xpath('//div[@class="p-item-info"]/@mon').extract_first().split('=')[1]
         dealUrl = 'http://www.nuomi.com/pcindex/main/shopchain?dealId=' + dealId
@@ -69,11 +75,12 @@ class NuomiSpider(CrawlSpider):
             city = js['data']['city'][shopCity]
             shopCityName = city['city_name']
             district = city['district'][district_id]['dist_name']
-            parmeta = {'shopCityName':shopCityName,'district':district }
+
+            parmeta['shopCityName'] = shopCityName
+            parmeta['district'] = district
+
 
             yield scrapy.Request(shop['link'], self.parse_nuomi_shop, meta=parmeta)
-            # yield scrapy.Request(shoplink, self.parse_nuomi_shop)
-            # yield scrapy.Request(shoplink, self.parse_nuomi_shop)
     def parse_nuomi_shop(self, response):
         with open(self.downshopUrlsFile, 'a') as f:
             f.write(response.url + '\n')

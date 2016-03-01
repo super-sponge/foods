@@ -74,7 +74,7 @@ def parse_dianping(response):
     item['shop_describe']= ''
     item['shop_service']= ''
     item['speciality']= ''
-    item['input_time']= time.strftime('')
+    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
     item['data_source']= response.url
     item['score5'] = ''
     item['score4'] = ''

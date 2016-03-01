@@ -133,7 +133,7 @@ HTTPCACHE_IGNORE_HTTP_CODES = [301, 302]
 
 
 FIELDS_TO_EXPORT_MEITUAN = ['shop_id','shop_name','shop_adress','shop_telephone1','shop_telephone2','shop_describe','shop_service','speciality','shop_hours','longitude_location','altitudes_location','shop_type1','shop_type2','district','street','score','consume_number','evaluate_number','shop_photo','input_time','update_time','data_source']
-FIELDS_TO_EXPORT_NUOMI = ['shop_id','shop_name','shop_adress','shop_telephone1','shop_telephone2','shop_describe','shop_service','shop_hours','longitude_location','altitudes_location','shop_type1','shop_type2','shop_shen','district','street','score','per_consume','evaluate_number','positive_number','moderate_number','negative_number','shop_photo','input_time','update_time','data_source']
+FIELDS_TO_EXPORT_NUOMI = ['shop_id','shop_name','shop_adress','shop_telephone1','shop_telephone2','shop_describe','shop_service','shop_hours','longitude_location','altitudes_location','nav0','nav1','nav2','nav3','nav4','nav5','shop_type1','shop_type2','shop_shen','district','street','score','per_consume','evaluate_number','positive_number','moderate_number','negative_number','shop_photo','input_time','update_time','data_source','deal_source']
 FIELDS_TO_EXPORT_DIANPING = [ 'shop_id','shop_name','shop_adress','shop_telephone','shop_describe','shop_service','speciality','shop_hours','longitude_location','altitudes_location','nav0','nav1','nav2','nav3','nav4','nav5','nav6','nav7','nav8','nav9','per_consume','taste_score','environment_score','serve_score','evaluate_number','score5','score4','score3','score2','score1','shop_photo','input_time','update_time','data_source']
 
 CSV_DELIMITER = ','
