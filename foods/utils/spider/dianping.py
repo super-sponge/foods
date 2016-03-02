@@ -105,7 +105,7 @@ def parse_dianping(response, file = None):
 
     item['shop_id']= re.search(r'/shop/([\d]+)$', response.url).group(1)
     item['shop_name'] = shop_name.strip().strip('\n')
-    item['shop_adress'] = shop_adress.replace('，','')
+    item['shop_adress'] = shop_adress.replace(u'，','')
     item['shop_telephone'] = shop_telephone
 
     lng = re.search(r'lng:([\d]+\.[\d]+)', response.body)
@@ -159,7 +159,7 @@ def parse_dianping(response, file = None):
         if lstlength == 1 and idx != -1:
             item['evaluate_number'] = brief[0:idx]
         elif lstitem[0] == u'人均':
-            item['per_consume'] = lstitem[1].replace('元','')
+            item['per_consume'] = lstitem[1].replace(u'元','')
         elif lstitem[0] == u'口味':
             item['taste_score'] = lstitem[1]
         elif lstitem[0] == u'环境':
