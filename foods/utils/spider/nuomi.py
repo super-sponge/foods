@@ -77,7 +77,8 @@ def parse_nuomi(response, meta = None, file = None):
         item['shop_name']= shop_name.replace(u',',' ').replace(u'，',' ')
     else:
         return None
-    item['shop_adress']= sel1.xpath('.//p[@class="bd detail-shop-address"]/span/text()').extract_first().replace(u',',' ').replace(u'，',' ')
+    shop_address = sel1.xpath('.//p[@class="bd detail-shop-address"]/span/text()').extract_first()
+    item['shop_adress']= shop_address.replace(u',',' ').replace(u'，',' ').replace('\n',' ')
     item['shop_telephone1']= sel1.xpath('.//p[@class="bd"]/text()').extract_first()
     item['shop_telephone2']= ''
     item['shop_describe']= ''
