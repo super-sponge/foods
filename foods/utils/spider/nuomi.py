@@ -63,7 +63,7 @@ class NuomiItem(Item):
     deal_source=Field() #糯米产品链接
 
 #解析文本内容
-def parse_nuomi(response, meta = None):
+def parse_nuomi(response, meta = None, file = None):
 
     item = NuomiItem()
 #定义两个模块变量
@@ -117,7 +117,11 @@ def parse_nuomi(response, meta = None):
     item['negative_number']= sel2.xpath('.//div/span[@class="levels qa-hook-bad-num"]/text()').extract_first()
     # item['shop_photo']= sel1.xpath('.//div[@class="shop-logo"]/img/@src').extract_first()
     item['shop_photo']= ''
-    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    if file == None:
+        item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        t = file.split('.')[-1]
+        item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     item['update_time']= ''
     item['data_source']= response.url
 
@@ -129,7 +133,7 @@ def saveItem(htmlfile, writer):
         html = f.read()
     url = 'http://www.nuomi.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
-    item = parse_nuomi(response)
+    item = parse_nuomi(response, file=htmlfile)
     # t = htmlfile.split('.')[-1]
     # item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
     if item:

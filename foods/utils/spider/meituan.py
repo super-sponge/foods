@@ -55,7 +55,7 @@ class MeituanItem(Item):
 
 
 #解析文本内容
-def parse_meituan(response):
+def parse_meituan(response, file = None):
 
     sel = response.xpath('//div[@data-component="bread-nav"]')
     tag = sel.xpath('div/a[@gaevent="crumb/index"]/text()').extract_first()
@@ -73,7 +73,11 @@ def parse_meituan(response):
     item['consume_number']= response.xpath('//div[@class="counts"]/div/span[@class="num"]/text()').extract_first()
     item['evaluate_number']=response.xpath('//div[@class="counts"]/div/a[@class="num rate-count"]/text()').extract_first()
     item['shop_photo']=''
-    item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    if file == None:
+        item['input_time']= time.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        t = file.split('.')[-1]
+        item['input_time'] = time.strftime('%Y-%m-%d %H:%M:%S',time.strptime(t,"%Y%m%d%H%M%S"))
 
     sel = response.xpath('//div[@class="fs-section__left"]')
 
@@ -123,7 +127,7 @@ def saveItem(htmlfile, writer):
         html = f.read()
     url = 'http://cq.meituan.com/shop/' + htmlfile.split('.')[-2]
     response = HtmlResponse(url=url,body=html)
-    item = parse_meituan(response)
+    item = parse_meituan(response, htmlfile)
     if item:
         row = []
         for id in FIELDS_TO_EXPORT_MEITUAN:
