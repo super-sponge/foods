@@ -41,8 +41,8 @@ def loadUrl(urlFile):
 
 
 class FilterLinkExtractor(LinkExtractor):
-    def __init__(self, allow=(), download = set()):
-        super(FilterLinkExtractor, self).__init__(allow=allow)
+    def __init__(self, allow=(), deny =(), download = set()):
+        super(FilterLinkExtractor, self).__init__(allow=allow, deny=deny)
         self.downloaded = download
 
     def extract_links(self, response):
