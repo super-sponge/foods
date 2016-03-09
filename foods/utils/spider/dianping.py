@@ -219,7 +219,7 @@ def parse_one(htmlfile):
 
 
 if __name__ == '__main__':
-    # parse_all()
+    parse_all()
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.36954358.20160229093050')
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.48130224.20160228131523')
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.18088299.20160229074648')
@@ -229,5 +229,5 @@ if __name__ == '__main__':
     # parse_one('/home/sponge/scrapy/hlwdata/data/page/www.dianping.com/shop.17198038.20160227225236')
     # parse_one('/home/scrapy/liuhb/hlwdata/data/page/www.dianping.com/shop.10003973.20160227225439')
     # parse_one('/home/scrapy/liuhb/hlwdata/data/page/www.dianping.com/shop.17549115.20160301165701')
-    parse_one('../hlwdata/data/page/www.dianping.com/shop.23423574.20160224220049')
-    parse_one('../hlwdata/data/page/www.dianping.com/shop.58771244.20160305024500')
+    # parse_one('../hlwdata/data/page/www.dianping.com/shop.23423574.20160224220049')
+    # parse_one('../hlwdata/data/page/www.dianping.com/shop.58771244.20160305024500')
