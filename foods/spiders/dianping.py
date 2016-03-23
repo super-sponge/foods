@@ -19,7 +19,8 @@ class DianpingSpider(CrawlSpider):
 
     lst = loadUrl(downLoadUrlsFile)
     rules = (
-        Rule(FilterLinkExtractor(allow=r'/shop/[\d]+$', deny= r'upload/shop/',download = lst), callback='parse_dianping', follow=True),
+        Rule(FilterLinkExtractor(allow=r'/shop/[\d]+$', deny= r'upload/shop/',download = lst), callback='parse_dianping', follow=False),
+        Rule(FilterLinkExtractor(allow=r'/search/category/[\d]+/[\d]+/p[\d]+',download = lst), callback='parse_dianping_search', follow=True),
         # Rule(FilterLinkExtractor(allow=r'https://www.dianping.com/shop/[\d]+$', download = lst), callback='parse_dianping', follow=True),
     )
 
@@ -35,3 +36,5 @@ class DianpingSpider(CrawlSpider):
         item = parse_dianping(response)
         if item:
             return item
+    def parse_dianping_search(self, response):
+        pass
