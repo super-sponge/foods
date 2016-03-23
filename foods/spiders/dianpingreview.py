@@ -4,6 +4,8 @@ from scrapy import Item, Field
 from scrapy.http import Request
 import re
 
+from foods.utils.comm import loadUrl
+
 
 class DianPingReviewItem(Item):
     shop_id = Field() #商家ID
@@ -21,8 +23,9 @@ class DianpingreviewSpider(scrapy.Spider):
         'https://www.dianping.com/shop/18506539/review_more'
     )
 
+    start_urls =loadUrl("../hlwdata/data/url/dianping_start_review_url.txt")
+
     def parse(self, response):
-        print response.url;
 
         shop_id = re.search(r'/shop/([\d]+)/review_more', response.url).group(1)
         for comment in response.xpath('//div[@class="comment-list"]/ul/li'):
