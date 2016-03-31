@@ -65,16 +65,18 @@ class SavePageToHbaseMiddleware(object):
                 else:
                     col.value = response.body
         if update :
-            if result.columnValues :
-                if havePage:
-                    client.put(self.hbaseTable, TPut(rowKey,result.columnValues))
-                else:
-                    val = TColumnValue(self.hbaseTableCf, self.hbaseColQualifier, response.body)
-                    client.put(self.hbaseTable, TPut(rowKey,result.columnValues + [val]))
-
-            else:
-                val = TColumnValue(self.hbaseTableCf, self.hbaseColQualifier, response.body)
-                client.put(self.hbaseTable, TPut(rowKey,[val]))
+            # if result.columnValues :
+            #     if havePage:
+            #         client.put(self.hbaseTable, TPut(rowKey,result.columnValues))
+            #     else:
+            #         val = TColumnValue(self.hbaseTableCf, self.hbaseColQualifier, response.body)
+            #         client.put(self.hbaseTable, TPut(rowKey,result.columnValues + [val]))
+            #
+            # else:
+            #     val = TColumnValue(self.hbaseTableCf, self.hbaseColQualifier, response.body)
+            #     client.put(self.hbaseTable, TPut(rowKey,[val]))
+            val = TColumnValue(self.hbaseTableCf, self.hbaseColQualifier, response.body)
+            client.put(self.hbaseTable, TPut(rowKey,[val]))
         self.transport.close()
 
         return response
