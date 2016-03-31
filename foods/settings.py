@@ -67,8 +67,14 @@ DOWNLOADER_MIDDLEWARES = {
     'foods.utils.middleware.RandomUserAgentMiddleware':400,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     # 'foods.utils.middleware.CustRedirectMiddleware':543,
-    'foods.utils.middleware.SavePageMiddleware':545
+    'foods.utils.middleware.SavePageMiddleware':545,
+    'foods.utils.middleware.SavePageToHbaseMiddleware':546
 }
+
+HBASE_THRIFT_HOST='dn1'
+HBASE_THRIFT_PORT=9090
+HBASE_THRIFT_TABLE='page'
+
 REDIRECT_ENABLED=False
 REDIRECT_SAVE_ENABLED = True
 

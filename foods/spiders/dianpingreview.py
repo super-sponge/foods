@@ -41,4 +41,7 @@ class DianpingreviewSpider(scrapy.Spider):
         nextPages = response.xpath('//div[@class="Pages"]/div[@class="Pages"]/a[@class="NextPage"]/@href').extract_first()
 
         if nextPages:
-            yield Request(response.url.split('?')[0] + nextPages, dont_filter=True,callback= self.parse)
+            meta = dict()
+            url = response.url.split('?')[0] + nextPages
+            meta['rowkey'] = url
+            yield Request(response.url.split('?')[0] + nextPages, dont_filter=True,callback= self.parse, meta=meta)
