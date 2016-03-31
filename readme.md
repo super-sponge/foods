@@ -31,3 +31,19 @@
     cd /home/scrapy/liuhb/foods
     export PYTHONPATH=/home/scrapy/liuhb/foods
     python  foods/utils/spider/dianping.py
+    
+# python 读取hbase
+
+## thrift 读取hbase
+
+### install thrift
+    请参考 hbase 官方网站
+    对于普通用户使用了自带的python ，需要进入thrift-0.9.3/lib/py 手动安装python的thrift 组件
+### 拷贝hbase的thrift 配置文件
+    对于用ambari + hdp 安装的hbase，其thrift在/usr/hdp/current/hbase-client/include/thrift目录下,启动thrift2 时拷贝hbase2.thrift
+### 根据hbase2.thrift 生成python文件
+    thrift -r --gen py hbase2.thrift
+### 编写客服端程序
+### 启动thrift server
+    /usr/hdp/current/hbase-master/bin/hbase-daemon.sh start thrift2
+## reset 读取hbase
